@@ -1,0 +1,19 @@
+CREATE OR REPLACE FUNCTION totalCustomers
+RETURN number IS
+   total number(2) := 0;
+   ts date;
+BEGIN
+
+   ts := add_years(now(), 1);
+
+   SELECT count(*) into total
+   FROM customers;
+   
+   RETURN total;
+END;
+
+CREATE OR REPLACE FUNCTION lyy_sum(a int, b int)
+RETURN integer AS
+BEGIN
+    RETURN a+b;
+END;

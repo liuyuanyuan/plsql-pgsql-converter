@@ -1,0 +1,150 @@
+2018-11-20 17:01:58 DEBUG Main.execute:122 - Enter
+2018-11-20 17:01:58 DEBUG Main.execute:129 - inArgs=--tree-type sql_script --input-sql * --output-sql * --convert --use-pgsql 
+2018-11-20 17:01:58 DEBUG Main.execute:130 - inSql=CREATE OR REPLACE PROCEDURE test.testcmt(id int)
+ is
+/* c line1
+/* c line2
+/* cline3 */
+ num int;
+ begin
+ select id into num from lyy;
+ end;
+2018-11-20 17:01:58 DEBUG CliOptions.parseCliOptions:62 - Enter:--tree-type sql_script --input-sql * --output-sql * --convert --use-pgsql 
+2018-11-20 17:01:58 DEBUG CliOptions.parseCliOptions:67 - arg=--tree-type
+2018-11-20 17:01:58 DEBUG CliOptions.parseCliOptions:67 - arg=--input-sql
+2018-11-20 17:01:58 DEBUG CliOptions.parseCliOptions:67 - arg=--output-sql
+2018-11-20 17:01:58 DEBUG CliOptions.parseCliOptions:67 - arg=--convert
+2018-11-20 17:01:58 DEBUG CliOptions.parseCliOptions:67 - arg=--use-pgsql
+2018-11-20 17:01:58 DEBUG Main.readInputSql:481 - Enter
+2018-11-20 17:01:58 DEBUG Main.readInputSql:502 - inputContent=CREATE OR REPLACE PROCEDURE test.testcmt(id int)
+ is
+/* c line1
+/* c line2
+/* cline3 */
+ num int;
+ begin
+ select id into num from lyy;
+ end;
+2018-11-20 17:01:58 DEBUG AstParser.parseTreeFromString:30 - Enter: printTokens=false, treeType=sql_script
+2018-11-20 17:01:59 DEBUG ReflectionUtil.callMethod:14 - Enter: obj=ru.barsopen.plsqlconverter.ast.DerivedSqlParser@7f010382, methodName=sql_script
+2018-11-20 17:01:59 DEBUG ReflectionUtil.callMethod:17 - Return: br.com.porcelli.parser.plsql.PLSQLParser$sql_script_return@15ff3e9e
+2018-11-20 17:01:59 DEBUG ReflectionUtil.callMethod:14 - Enter: obj=br.com.porcelli.parser.plsql.PLSQLParser$sql_script_return@15ff3e9e, methodName=getTree
+2018-11-20 17:01:59 DEBUG ReflectionUtil.callMethod:17 - Return: SQL_SCRIPT
+2018-11-20 17:01:59 DEBUG AstParser.parseTreeFromString:63 - tree:line=1, CharPositionInLine=18,text=SQL_SCRIPT, childCount=1,childIndex=-1
+2018-11-20 17:01:59 DEBUG Main.readInputSql:542 - Return
+2018-11-20 17:03:49 DEBUG Main.execute:122 - Enter
+2018-11-20 17:03:49 DEBUG Main.execute:129 - inArgs=--tree-type sql_script --input-sql * --output-sql * --convert --use-pgsql 
+2018-11-20 17:03:49 DEBUG Main.execute:130 - inSql=CREATE OR REPLACE PROCEDURE test.testcmt(id int)
+ is
+/* c line1
+/* c line2
+/* cline3 */
+ num int;
+ begin
+ select id into num from lyy;
+ end;
+2018-11-20 17:03:49 DEBUG CliOptions.parseCliOptions:62 - Enter:--tree-type sql_script --input-sql * --output-sql * --convert --use-pgsql 
+2018-11-20 17:03:49 DEBUG CliOptions.parseCliOptions:67 - arg=--tree-type
+2018-11-20 17:03:49 DEBUG CliOptions.parseCliOptions:67 - arg=--input-sql
+2018-11-20 17:03:49 DEBUG CliOptions.parseCliOptions:67 - arg=--output-sql
+2018-11-20 17:03:49 DEBUG CliOptions.parseCliOptions:67 - arg=--convert
+2018-11-20 17:03:49 DEBUG CliOptions.parseCliOptions:67 - arg=--use-pgsql
+2018-11-20 17:03:49 DEBUG Main.readInputSql:481 - Enter
+2018-11-20 17:03:49 DEBUG Main.readInputSql:502 - inputContent=CREATE OR REPLACE PROCEDURE test.testcmt(id int)
+ is
+/* c line1
+/* c line2
+/* cline3 */
+ num int;
+ begin
+ select id into num from lyy;
+ end;
+2018-11-20 17:03:49 DEBUG AstParser.parseTreeFromString:30 - Enter: printTokens=false, treeType=sql_script
+2018-11-20 17:03:49 DEBUG ReflectionUtil.callMethod:14 - Enter: obj=ru.barsopen.plsqlconverter.ast.DerivedSqlParser@670002, methodName=sql_script
+2018-11-20 17:03:49 DEBUG ReflectionUtil.callMethod:17 - Return: br.com.porcelli.parser.plsql.PLSQLParser$sql_script_return@32eff876
+2018-11-20 17:03:49 DEBUG ReflectionUtil.callMethod:14 - Enter: obj=br.com.porcelli.parser.plsql.PLSQLParser$sql_script_return@32eff876, methodName=getTree
+2018-11-20 17:03:49 DEBUG ReflectionUtil.callMethod:17 - Return: SQL_SCRIPT
+2018-11-20 17:03:49 DEBUG AstParser.parseTreeFromString:63 - tree:line=1, CharPositionInLine=18,text=SQL_SCRIPT, childCount=1,childIndex=-1
+2018-11-20 17:03:49 DEBUG Main.readInputSql:542 - Return
+2018-11-20 17:03:50 DEBUG Main.doAttach:343 - cmt=/* c line1
+/* c line2
+/* cline3 */
+2018-11-20 17:03:50 DEBUG Main.execute:169 - validateReparse=false
+2018-11-20 17:03:50 DEBUG Main.execute:211 - splitOutput=false
+2018-11-20 17:03:50 DEBUG AstPrinter.printTreeToPostgresqlString:92 - Enter:treeType=sql_script
+2018-11-20 17:03:50 DEBUG AstPrinter.printTreeToPostgresqlString:93 - theTree:text=SQL_SCRIPT, Line=1, CharPositionInLine=18
+2018-11-20 17:03:50 DEBUG ReflectionUtil.callMethod:14 - Enter: obj=ru.barsopen.plsqlconverter.ast.DerivedSqlPrinter@41d477ed, methodName=sql_script
+2018-11-20 17:03:50 DEBUG ReflectionUtil.callMethod:17 - Return: 
+create or replace function test.testcmt (id /*  c line1
+  c line2
+  cline3   */ integer)
+returns void
+
+as $$
+#variable_conflict use_column
+declare
+  num integer;
+begin
+  select id
+  into strict num
+  from lyy
+  ;
+end;
+$$
+language plpgsql;
+
+2018-11-20 17:03:50 DEBUG AstPrinter.printTreeToPostgresqlString:104 - Return:
+create or replace function test.testcmt (id /*  c line1
+  c line2
+  cline3   */ integer)
+returns void
+
+as $$
+#variable_conflict use_column
+declare
+  num integer;
+begin
+  select id
+  into strict num
+  from lyy
+  ;
+end;
+$$
+language plpgsql;
+
+2018-11-20 17:03:50 DEBUG Main.execute:219 - Return: 
+create or replace function test.testcmt (id /*  c line1
+  c line2
+  cline3   */ integer)
+returns void
+
+as $$
+#variable_conflict use_column
+declare
+  num integer;
+begin
+  select id
+  into strict num
+  from lyy
+  ;
+end;
+$$
+language plpgsql;
+
+2018-11-20 17:03:50 DEBUG Main.main:86 - outSql = create or replace function test.testcmt (id /*  c line1
+  c line2
+  cline3   */ integer)
+returns void
+
+as $$
+#variable_conflict use_column
+declare
+  num integer;
+begin
+  select id
+  into strict num
+  from lyy
+  ;
+end;
+$$
+language plpgsql;

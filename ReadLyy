@@ -1,0 +1,208 @@
+PLSQLConverter研究文档
+作者：刘媛媛
+1.下载和解压ant和jdk包
+2.添加ANT_HOME和JAVA_HOME的环境变量，以及为ant和java配置PATH和CLASSPATH.
+在linux下配置环境变量的方法
+[root@localhost dev]# vi ~/.bash_profile 
+
+export ANT_HOME=/root/Desktop/apache-ant-1.10.1
+export JAVA_HOME=/root/Desktop/jdk1.8
+export PATH=$JAVA_HOME/bin:$PATH:$ANT_HOME/bin
+export CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar
+
+:wq保存并退出
+[root@localhost dev]# source ~/.bash_profile
+
+---------------------------------------------------------------
+3.进行ant构建
+[root@localhost converter]# pwd
+/root/Desktop/plsql-postgresql-converter/converter
+[root@localhost converter]# ant
+Buildfile: F:\mars_workspace\plsql-postgresql-converter\converter\build.xml
+
+init:
+
+build-plsqlprinter:
+   [delete] Deleting directory F:\mars_workspace\plsql-postgresql-converter\converter\plsqlprinter-src\generated
+    [mkdir] Created dir: F:\mars_workspace\plsql-postgresql-converter\converter\plsqlprinter-src\generated\ru\barsopen\plsqlconverter
+
+build-typedast:
+
+build:
+     [echo] plsqlconverter: F:\mars_workspace\plsql-postgresql-converter\converter\build.xml
+    [javac] Compiling 2 source files to F:\mars_workspace\plsql-postgresql-converter\converter\bin
+    [javac] 警告: [options] 未与 -source 1.7 一起设置引导类路径
+    [javac] 1 个警告
+     [copy] Copying 6 files to F:\mars_workspace\plsql-postgresql-converter\converter\output
+      [jar] Building jar: F:\mars_workspace\plsql-postgresql-converter\converter\output\plsqlconverter.jar
+
+BUILD SUCCESSFUL
+Total time: 6 seconds
+注意：如果本步骤在windows下执行，那么需要修改plsql-postgresql-converter\converter\build.xml中的分隔符：
+在linux下使用:分隔 
+<arg value="tools/antlr-3.5.2.jar:tools/antlr-runtime-3.5.2.jar:tools/ST4-4.0.8.jar"/>
+在windows下使用;分隔
+<arg value="tools/antlr-3.5.2.jar;tools/antlr-runtime-3.5.2.jar;tools/ST4-4.0.8.jar"/>
+
+
+4.然后到plsql-postgresql-converter\converter\output下面执行plsqlconvert（bash脚本只适用linux）
+[root@localhost output]# ./plsqlconvert --help
+Usage: plsqconverter [options]
+
+  --help
+  --all-packages
+  --validate-reparse
+  --validate-reparse-ast-path
+  --limit-all-packages <N>
+  --tree-type (sql_script|statement|expression)
+  --input-sql (path|-)
+  --input-xml (path|-)
+  --input-serialized path
+  --convert
+  --use-pgsql
+  --split-output
+    (in this case --output-sql, --output-ast are templates:
+      {i} is replaced by item index,
+      {t} is replaced by item type,
+      {n} is replaced by item name
+      e.g., --output-sql '{i}_{t}_{n}.sql'
+  --output-sql (path|-)
+  --output-ast (path|-)
+  --output-xml (path|-)
+  --output-serialized path
+  --debug
+
+5.执行普通的单独sql语句的转换
+方法1：直接执行
+[root@localhost plsql-postgresql-converter]# echo 'select t1.x from Table1 t1, Table2 t2, Table3 t3 where t1.t3_id (+) = t3.id and t1.x = t2.y' | converter/output/plsqlconvert --tree-type statement --input-sql sql.txt  --output-sql - --convert --use-pgsql 2>/dev/null
+select t1.x
+from Table2 t2,
+  Table3 t3
+left join Table1 t1 on t1.t3_id = t3.id
+where t1.x = t2.y
+
+方法2：将目标sql放到txt文件中
+[root@localhost plsql-postgresql-converter]# vi sql.txt
+[root@localhost plsql-postgresql-converter]# cat sql.txt
+select t1.x from Table1 t1, Table2 t2, Table3 t3 where t1.t3_id (+) = t3.id and t1.x = t2.y;
+[root@localhost plsql-postgresql-converter]# converter/output/plsqlconvert --tree-type statement --input-sql sql.txt  --output-sql - --convert --use-pgsql 2>/dev/null
+select t1.x
+from Table2 t2,
+  Table3 t3
+left join Table1 t1 on t1.t3_id = t3.id
+where t1.x = t2.y
+
+6.执行存储函数的转换
+[root@localhost plsql-postgresql-converter]# vi example.txt
+[root@localhost plsql-postgresql-converter]# cat example.txt
+CREATE OR REPLACE FUNCTION totalCustomers
+RETURN number IS
+   total number(2) := 0;
+   ts date;
+BEGIN
+
+   ts := add_years(now(), 1);
+
+   SELECT count(*) into total
+   FROM customers;
+   
+   RETURN total;
+END;
+[root@localhost plsql-postgresql-converter]# converter/output/plsqlconvert --tree-type sql_script --input-sql example.txt --output-sql - --convert --use-pgsql 2>/dev/null
+
+create or replace function totalCustomers ()
+returns numeric
+
+as $$
+#variable_conflict use_column
+declare
+  total smallint default 0;
+  ts timestamp;
+begin
+  ts := cast(now() as timestamp) + 1 * interval '1 year';
+  select count(*)
+  into strict total
+  from customers
+  ;
+  return total;
+end;
+$$
+language plpgsql;
+
+
+语法转换的基本使用语法:
+converter/output/plsqlconvert --tree-type [statement|sql_script] --input-sql sql.txt  --output-sql - --convert --use-pgsql 2>/dev/null
+plsqlconvert脚本(是linux bash脚本)的基本内容是：
+java [jvm_arg] -jar plsqlconverter.jar [convert_arg]
+[jvm_arg]一般省略即可；
+[convert_arg]最后的--use-pgsql 2>/dev/null在windows下省去即可。
+例如：
+F:\mars_workspace\plsql-postgresql-converter\converter\output>java -jar plsqlconverter.jar --tree-type sql_script --input-sql example.txt --output-sql - --convert --use-pgsql
+2017-09-30 17:02:23 DEBUG Main.main:70 - Enter:--tree-typesql_script--input-sql example.txt--output-sql---convert--use-pgsql
+2017-09-30 17:02:23 DEBUG Main.parseCliOptions:60 - Enter:--tree-typesql_script--input-sqlexample.txt--output-sql---convert--use-pgsql
+2017-09-30 17:02:23 DEBUG Main.parseCliOptions:65 - arg=--tree-type
+2017-09-30 17:02:23 DEBUG Main.parseCliOptions:65 - arg=--input-sql
+2017-09-30 17:02:23 DEBUG Main.parseCliOptions:65 - arg=--output-sql
+2017-09-30 17:02:23 DEBUG Main.parseCliOptions:65 - arg=--convert
+2017-09-30 17:02:23 DEBUG Main.parseCliOptions:65 - arg=--use-pgsql
+Parse took 0.572000 seconds
+doing nested functions...
+For ID NOW at 7:19 could not find entry in scope
+For ID ADD_YEARS at 7:9 could not find entry in scope
+doing procedure to function...
+For ID NOW at 7:19 could not find entry in scope
+For ID ADD_YEARS at 7:9 could not find entry in scope
+doing misc conversion...
+doing outer joins...
+doing packages...
+For ID NOW at 7:19 could not find entry in scope
+doing datatypes...
+doing perform...
+
+create or replace function totalCustomers ()
+returns numeric
+
+as $$
+#variable_conflict use_column
+declare
+  total smallint default 0;
+  ts timestamp;
+begin
+  ts := cast(now() as timestamp) + 1 * interval '1 year';
+  select count(*)
+  into strict total
+  from customers
+  ;
+  return total;
+end;
+$$
+language plpgsql;
+------------------------------------------------
+6.源码在Eclipse中的编译开发
+源码直接导入源码到Eclipse for JEE中，会发现src包ru.barsopen.plsqlconverter中缺少两个java类文件。
+ant构建后plsql-postgresql-converter\converter\plsqlprinter-src\generated\ru\barsopen\plsqlconverter下面会生成两个java文件：
+PLSQLPrinter_PLSQLPrinter_DDL.java
+PLSQLPrinter.java
+复制到ru.barsopen.plsqlconverter包底下即可。
+
+7.源码修改完毕后的项目构建和运行
+在源码中convert目录下，执行ant即可构建完成。
+然后convert/output/plgsqlconvert --help开始运行程序。
+
+8.引入log4j来打印日志
+将jar包log4j-1.2.17.ja、slf4j-api-1.7.2.jar、slf4j-log4j12-1.7.2.jar拷贝到lib下；
+在src根目录添加log4j.properties配置文件；
+在build.xml中配置log4j的三个jar包；
+        <jar destfile="output/plsqlconverter.jar">
+          <fileset dir="bin" />
+          <fileset dir="${dir.plsqlprinter.templates}" includes="**/*.stg" />
+          <manifest>
+            <attribute name="Main-Class" value="ru.barsopen.plsqlconverter.Main" />
+            <attribute name="Class-Path" value="lexer-parser-walker-1.0-SNAPSHOT.jar antlr-runtime-3.5.2.jar stringtemplate-3.2.1.jar antlr-2.7.7.jar commons-io-2.4.jar log4j-1.2.17.jar slf4j-api-1.7.2.jar slf4j-log4j12-1.7.2.jar" />
+          </manifest>
+        </jar>
+在代码中Logger logger = LoggerFactory.getLogger(Main.class);使用logger打印日志即可。
+之后convert目录下执行ant，再次执行output/plsqlconvert --help即可输出日志。
+
+
+
