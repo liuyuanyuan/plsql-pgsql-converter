@@ -53,6 +53,7 @@ public class Main
 
 	public static void main(String[] args) throws Exception 
 	{
+                //normal exapmle
 		/*
 		String inSql = "CREATE OR REPLACE FUNCTION totalCustomers\n" + 
 				"RETURN number IS\n" + 
@@ -67,17 +68,32 @@ public class Main
 				"   \n" + 
 				"   RETURN total;\n" + 
 				"END;";	
+                //inSql = inSql + "\n" + inSql;
 		*/
-		String inSql = "CREATE OR REPLACE PROCEDURE test.testcmt(id int)\n"
-				+ " is\n"
-				+ "/* c line1\n"
-				+ "/* c line2\n"
-				+ "/* cline3 */\n"
-				+ " num int;\n"
-				+ " begin\n"
-				+ " select id into num from lyy;\n"
-				+ " end;";
-		//inSql = inSql + "\n" + inSql;
+               
+                //comment example
+//		String inSql = "CREATE OR REPLACE PROCEDURE test.testcmt(id int)\n"
+//				+ " is\n"
+//				+ "/* c line1\n"
+//				+ "/* c line2\n"
+//				+ "/* cline3 */\n"
+//				+ " num int;\n"
+//				+ " begin\n"
+//				+ " select id into num from lyy;\n"
+//				+ " end;";
+                
+                //left join example
+               String inSql = "create or replace function test.testjoin\n"
+                    + "   return int\n"
+                    + "   is\n"
+                    + "   age int;\n"
+                    + "begin\n"
+                    + "   select lyy2.age into age from lyy,lyy2 where lyy.id=lyy2.id(+);\n"
+                    + "   return age;\n"
+                    + "end;";
+                             
+               
+                		
 		//String inSql = "create table yy(id int);";
 		try 
 		{
@@ -201,7 +217,7 @@ public class Main
 			DatatypeConversionTransformer.transformAll(ast);
 			System.err.println("doing perform...");
 			ProcedurePerformConversionTransformer.transformAll(ast);
-			IntoStrictConversionTransformer.transformAll(ast);
+			//IntoStrictConversionTransformer.transformAll(ast);// PG into needn't strict(strict only support for null or one record)
 			CustomTypesConversionTransformer.transformAll(ast);
 		}
 
