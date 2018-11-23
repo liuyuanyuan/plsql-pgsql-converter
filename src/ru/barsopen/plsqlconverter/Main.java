@@ -355,7 +355,7 @@ public class Main
 			node.setComments(new AttachedComments());
 		}
 		
-                //compatibility for PG comment
+                // compatibility for PG comment
 		String cmt = c.getText();
 		logger.debug("cmt before=" + cmt);
 		if (cmt != null)
