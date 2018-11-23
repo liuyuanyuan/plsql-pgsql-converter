@@ -68,7 +68,7 @@ language plpgsql;
 
 
 
------ left join example -----
+----- left join and into strict example -----
 /* oracle */
 CREATE OR REPLACE function TEST.testjoin
    return int
@@ -82,7 +82,6 @@ end;
 /* converted into PG */
 create or replace function test.testjoin ()
 returns integer
-
 as $$
 #variable_conflict use_column
 declare
@@ -98,10 +97,42 @@ end;
 $$
 language plpgsql;
 
+------Remove <name> after END from tokens(PG not support END <name>).--------
+/* oracle */
+# create 
+create or replace procedure test_endname(str out varchar(20)
+as
+begin
+   select name into str from lyy where id=1;
+end test_endname;
+# execute
+SQL> var str varchar2(20);
+SQL> exec test_endname(:str);
+PL/SQL 过程已成功完成。
+SQL> print str
+STR
+--------------
+lyy
+# or
+SQL> select :str from dual;
+:STR
+--------------
+lyy
 
-
-
-
+/*into PG*/
+create or replace function TEST.test_endname (str OUT lyy.name%type)
+returns lyy.name%type
+as $$
+#variable_conflict use_column
+begin
+  select name
+  into str
+  from lyy
+  where id = 1
+  ;
+end ;
+$$
+language plpgsql;
 
 
 

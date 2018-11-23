@@ -72,14 +72,14 @@ public class Main
 		*/
             
             //package name exapmle
-            String inSql = "CREATE OR REPLACE package body TEST.pkg_lyy\n"
-                    + "as\n"
-                    + "    procedure spStr(str out varchar)\n"
-                    + "    is\n"
-                    + "    begin\n"
-                    + "        select name into str from lyy where id=1;\n"
-                    + "    end spStr;\n"
-                    + "end pkg_lyy;";
+//            String inSql = "CREATE OR REPLACE package body TEST.pkg_lyy\n"
+//                    + "as\n"
+//                    + "    procedure spStr(str out varchar)\n"
+//                    + "    is\n"
+//                    + "    begin\n"
+//                    + "        select name into str from lyy where id=1;\n"
+//                    + "    end spStr;\n"
+//                    + "end pkg_lyy;";
                               
                 //comment example
 //		String inSql = "CREATE OR REPLACE PROCEDURE test.testcmt(id int)\n"
@@ -101,8 +101,14 @@ public class Main
 //                    + "   select lyy2.age into age from lyy,lyy2 where lyy.id=lyy2.id(+);\n"
 //                    + "   return age;\n"
 //                    + "end;";
-                             
-               
+                      
+                //end name example
+            String inSql = "CREATE OR REPLACE procedure TEST.test_endname(str out lyy.name%type)\n"
+                    + "as\n"
+                    + "begin\n"
+                    + "   select name into str from lyy where id=1;\n"
+                    + "end test_endname;";
+
                 		
 		//String inSql = "create table yy(id int);";
 		try 
@@ -121,7 +127,7 @@ public class Main
 	public String convert(String inSql) throws Exception
 	{
 		String[] inArgs = new String[] {"--tree-type", "sql_script", "--input-sql", "*", "--output-sql", "*",
-				"--convert", "--use-pgsql"};//--tree-type only "sql_script" pass test
+				"--convert", "--use-pgsql", "--debug"};//--tree-type only "sql_script" pass test
 		String outSQL = execute(inArgs, inSql);
 		outSQL = outSQL.trim();
 		return outSQL;
@@ -178,16 +184,19 @@ public class Main
 		List<Token> comments = new ArrayList<Token>();
 		for (Token token : parseResult.tokens)
 		{
-			//logger.debug("token: " + token.toString());
+			//logger.debug("token index=" + token.getTokenIndex() + ", type=" + token.getType() + ", text=" + token.getText());
 			if (token.getType() == PLSQLLexer.COMMENT)
 			{
 				comments.add(token);
-			}
+			}                        
 		}
+                logger.debug("tokens=" + parseResult.tokens + ", tree=" +  parseResult.tree);
+                
 
 		//[6]
 		_baseNode ast = (_baseNode) ReflectionUtil.callStaticMethod(parser.class, "parse" + options.tree_type,
 				parseResult.tree);
+                logger.debug(ast.toString());
         
 		//[7]
 		attachComments(ast, comments, parseResult.tokens);
@@ -197,7 +206,6 @@ public class Main
 		{
 			String errorMessage = validatePrintedTreeMatchesParsedTree(parseResult.tree,
 					options.validateReparseOutputAstPath, options.tree_type);
-
 			logger.debug("errorMessage=" + errorMessage);
 			if (errorMessage != null)
 			{
@@ -213,7 +221,7 @@ public class Main
 			OracleOuterJoinTransformer.isDebugEnabled = options.debug;
 			System.err.println("doing nested functions...");
 			NestedFunctionConversionTransformer.transformAll(ast);
-			System.err.println("doing procedure to function...");
+			System.err.println("doing procedure to function...");                        
 			ProcedureToFunctionConversionTransformer.transformAll(ast);
 			// System.err.println("doing named function result (forward)...");
 			// FunctionNamedResultConversionTransformer.transformAllForward(ast);

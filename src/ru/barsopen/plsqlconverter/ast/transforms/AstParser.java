@@ -1,5 +1,6 @@
 package ru.barsopen.plsqlconverter.ast.transforms;
 
+import br.com.porcelli.parser.plsql.PLSQLLexer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,6 +50,25 @@ public class AstParser {
 			System.exit(0);
 		}
 		
+                //(by lyy) remove name after end 
+                cts.fill();
+                //logger.debug("Tokens=" + cts.getTokens());
+                for (Token t : cts.getTokens())
+                {
+                    //logger.debug("token index=" + t.getType() + ", text=" + t.getText());
+                    if (t.getType() == PLSQLLexer.SQL92_RESERVED_END)
+                    {
+                        int index = t.getTokenIndex();
+                        if (cts.getTokens().size() > (index + 2)
+                            && cts.getTokens().get(index + 1).getType() == PLSQLLexer.SEPARATOR
+                            && cts.getTokens().get(index + 2).getType() == PLSQLLexer.REGULAR_ID)
+                        {
+                            cts.getTokens().get(index + 2).setText("");
+                            logger.debug("tokens=" + cts.getTokens().toString());
+                        }
+                     }
+                }
+                
 		DerivedSqlParser p = new DerivedSqlParser(cts);
 		Object tree = ReflectionUtil.callMethod(ReflectionUtil.callMethod(p, treeType), "getTree");
 	
@@ -60,14 +80,7 @@ public class AstParser {
 		result.lexerErrors = l.errors;
 		result.parserErrors = p.errors;
 		
-		logger.debug("tree:line=" + theTree.getLine() + ", CharPositionInLine=" + theTree.getCharPositionInLine()
-		+ ",text=" + theTree.getText() + ", childCount=" + theTree.getChildCount() + ",childIndex=" + theTree.getChildIndex());
-		for (Token t : cts.getTokens())
-		{
-			//logger.debug("token:line=" + t.getLine() + ", CharPositionInLine=" + t.getCharPositionInLine() 
-			//+ ", text="	+ t.getText() + ", type=" + t.getType());
-		}	
-		
+		logger.debug("Return:" + result.toString());
 		return result;
 	}
 }
