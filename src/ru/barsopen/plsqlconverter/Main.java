@@ -70,7 +70,17 @@ public class Main
 				"END;";	
                 //inSql = inSql + "\n" + inSql;
 		*/
-               
+            
+            //package name exapmle
+            String inSql = "CREATE OR REPLACE package body TEST.pkg_lyy\n"
+                    + "as\n"
+                    + "    procedure spStr(str out varchar)\n"
+                    + "    is\n"
+                    + "    begin\n"
+                    + "        select name into str from lyy where id=1;\n"
+                    + "    end spStr;\n"
+                    + "end pkg_lyy;";
+                              
                 //comment example
 //		String inSql = "CREATE OR REPLACE PROCEDURE test.testcmt(id int)\n"
 //				+ " is\n"
@@ -83,14 +93,14 @@ public class Main
 //				+ " end;";
                 
                 //left join example
-               String inSql = "create or replace function test.testjoin\n"
-                    + "   return int\n"
-                    + "   is\n"
-                    + "   age int;\n"
-                    + "begin\n"
-                    + "   select lyy2.age into age from lyy,lyy2 where lyy.id=lyy2.id(+);\n"
-                    + "   return age;\n"
-                    + "end;";
+//               String inSql = "create or replace function test.testjoin\n"
+//                    + "   return int\n"
+//                    + "   is\n"
+//                    + "   age int;\n"
+//                    + "begin\n"
+//                    + "   select lyy2.age into age from lyy,lyy2 where lyy.id=lyy2.id(+);\n"
+//                    + "   return age;\n"
+//                    + "end;";
                              
                
                 		

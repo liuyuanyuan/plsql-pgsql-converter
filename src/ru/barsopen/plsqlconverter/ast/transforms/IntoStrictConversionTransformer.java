@@ -10,7 +10,7 @@ public class IntoStrictConversionTransformer {
 	public static void transformAll(_baseNode tree) throws Exception {
 		List<into_clause_normal> intoClauses = AstUtil.getDescendantsOfType(tree, into_clause_normal.class);
 		for (into_clause_normal clause: intoClauses) {
-			clause.PGSQL_STRICT = AstUtil.createAstNode(PLSQLPrinter.PGSQL_STRICT);
+			clause.PGSQL_STRICT = AstUtil.createAstNode(PLSQLPrinter.PGSQL_STRICT);//add [strict] after [into]
 		}
 	}
 }

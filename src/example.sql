@@ -1,4 +1,40 @@
 
+----package name(package->package.function) example-----
+/* oracle */
+/*create package (package -> schema)*/
+create or replace package pkg_lyy
+as
+    procedure spStr(str out varchar);
+end pkg_lyy;
+/
+/*create package body(package procedure/function -> package.procedure/function)*/
+create or replace package body pkg_lyy
+as
+    procedure spStr(str out varchar)
+    is
+    begin
+        select name into str from lyy where id=1;
+    end spStr;
+end pkg_lyy;
+/
+/*into PG*/
+create or replace function PKG_LYY.SPSTR (str OUT varchar)
+returns varchar
+as $$
+# variable_conflict use_column
+begin
+  select name
+  into str
+  from lyy
+  where id = 1
+  ;
+end;
+$$
+language plpgsql;
+
+
+
+
 ----comment example----
 /* oracle */
 CREATE OR REPLACE PROCEDURE test.testcmt(id int)
@@ -11,15 +47,13 @@ begin
   select id into num from lyy;
 end;
 /
-
 /* converted into PG */
 create or replace function test.testcmt (id /*  c line1
   c line2
   cline3   */ integer)
 returns void
-
 as $$
-#variable_conflict use_column
+# variable_conflict use_column
 declare
   num integer;
 begin
@@ -30,6 +64,8 @@ begin
 end;
 $$
 language plpgsql;
+
+
 
 
 ----- left join example -----
@@ -43,7 +79,6 @@ begin
  return age;
 end;
 /
-
 /* converted into PG */
 create or replace function test.testjoin ()
 returns integer
@@ -62,6 +97,9 @@ begin
 end;
 $$
 language plpgsql;
+
+
+
 
 
 
