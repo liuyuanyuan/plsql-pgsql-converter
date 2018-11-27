@@ -3,7 +3,6 @@ package ru.barsopen.plsqlconverter.ast.transforms;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.*;
 import java.nio.charset.Charset;
 
 import org.antlr.runtime.RecognitionException;
@@ -110,8 +109,8 @@ public class AstPrinter {
 	
 	public static StringTemplateGroup getOracleSTG() {
 		//logger.debug("Enter: " + (new File("PLSQLPrinterTemplates.stg")).exists());
-		try (InputStream templateInputStream = new FileInputStream(new File("PLSQLPrinterTemplates.stg"))){ //for main test, for export(file move under hgadmin)
-		//try (InputStream templateInputStream = AstPrinter.class.getClassLoader().getResourceAsStream("PLSQLPrinterTemplates.stg")) {//for rcp runtime
+		//try (InputStream templateInputStream = new FileInputStream(new File("PLSQLPrinterTemplates.stg"))){ //for main test, for export(file move under hgadmin)
+		try (InputStream templateInputStream = AstPrinter.class.getClassLoader().getResourceAsStream("PLSQLPrinterTemplates.stg")) {//for rcp runtime
 			//logger.debug("templateInputStream=" + templateInputStream);
 			StringTemplateGroup templateGroup = new StringTemplateGroup(new InputStreamReader(templateInputStream, Charset.forName("UTF-8")), AngleBracketTemplateLexer.class);
 			//logger.debug("name=" + templateGroup.getName() + ",class=" + templateGroup.getClass());
@@ -122,8 +121,8 @@ public class AstPrinter {
 	}
 	
 	public static StringTemplateGroup getPostgresqlSTG() {
-		try (InputStream templateInputStream = new FileInputStream(new File("PLPGSQLPrinterTemplates.stg"))){ //for main test, for export(file move under hgadmin)
-		//try (InputStream templateInputStream = AstPrinter.class.getClassLoader().getResourceAsStream("PLPGSQLPrinterTemplates.stg")) {//for rcp runtime 
+		//try (InputStream templateInputStream = new FileInputStream(new File("PLPGSQLPrinterTemplates.stg"))){ //for main test, for export(file move under hgadmin)
+		try (InputStream templateInputStream = AstPrinter.class.getClassLoader().getResourceAsStream("PLPGSQLPrinterTemplates.stg")) {//for rcp runtime 
 			StringTemplateGroup templateGroup = new StringTemplateGroup(new InputStreamReader(templateInputStream, Charset.forName("UTF-8")), AngleBracketTemplateLexer.class);
 			templateGroup.setSuperGroup(getOracleSTG());
 			return templateGroup;
