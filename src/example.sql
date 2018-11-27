@@ -133,6 +133,32 @@ begin
 end ;
 $$
 language plpgsql;
+# execute
+select test_endname();
+
+
+
+---Oracle select unique -> PG select distinct ---
+/*oracle*/
+CREATE OR REPLACE procedure TEST.test_unique2(num out int)
+as
+begin
+    select unique id into num from  lyy;
+end;
+/*PG*/
+create or replace function TEST.test_unique2 (num OUT integer)
+returns integer
+as $$
+#variable_conflict use_column
+begin
+  select distinct
+  id
+  into num
+  from lyy
+  ;
+end;
+$$
+language plpgsql;
 
 
 

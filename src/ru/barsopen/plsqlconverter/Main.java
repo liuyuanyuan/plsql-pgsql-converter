@@ -46,6 +46,7 @@ import ru.barsopen.plsqlconverter.util.ReflectionUtil;
 import ru.barsopen.plsqlconverter.util.TokenCounter;
 import br.com.porcelli.parser.plsql.PLSQLLexer;
 import br.com.porcelli.parser.plsql.PLSQLParser;
+import ru.barsopen.plsqlconverter.ast.transforms.Oracle2PGSyntaxTransformer;
 
 public class Main
 {
@@ -103,16 +104,23 @@ public class Main
 //                    + "end;";
                       
                 //end name example
-            String inSql = "CREATE OR REPLACE procedure TEST.test_endname(str out lyy.name%type)\n"
+//            String inSql = "CREATE OR REPLACE procedure TEST.test_endname(str out lyy.name%type)\n"
+//                    + "as\n"
+//                    + "begin\n"
+//                    + "   select name into str from lyy where id=1;\n"
+//                    + "end test_endname;";
+            
+                 //select unique->select distinct
+                String inSql = "CREATE OR REPLACE procedure TEST.test_unique2(num out int)\n"
                     + "as\n"
                     + "begin\n"
-                    + "   select name into str from lyy where id=1;\n"
-                    + "end test_endname;";
-
+                    + "    select unique id into num from  lyy;\n"
+                    + "end;";
                 		
 		//String inSql = "create table yy(id int);";
 		try 
 		{
+                        logger.debug(inSql);
 			//[0] core method
 			String outSql = new Main().convert(inSql);
 			logger.debug("outSql = " + outSql);
@@ -154,7 +162,7 @@ public class Main
 		logger.debug("Enter");
 		//[0] check in parameter 
 		if (inArgs == null 
-				|| inSql == null || inSql.isEmpty()) {
+                    || inSql == null || inSql.isEmpty()) {
 			logger.error("inArgs or inSql is null, do nothing and return null.");
 			return null;
 		}
@@ -196,7 +204,7 @@ public class Main
 		//[6]
 		_baseNode ast = (_baseNode) ReflectionUtil.callStaticMethod(parser.class, "parse" + options.tree_type,
 				parseResult.tree);
-                logger.debug(ast.toString());
+                logger.debug("ast=" + ast);
         
 		//[7]
 		attachComments(ast, comments, parseResult.tokens);
@@ -235,7 +243,8 @@ public class Main
 			DatatypeConversionTransformer.transformAll(ast);
 			System.err.println("doing perform...");
 			ProcedurePerformConversionTransformer.transformAll(ast);
-			//IntoStrictConversionTransformer.transformAll(ast);// PG into needn't strict(strict only support for null or one record)
+                        // disable, bacause PG into needn't strict(strict only support for null or one record)
+			//IntoStrictConversionTransformer.transformAll(ast);
 			CustomTypesConversionTransformer.transformAll(ast);
 		}
 

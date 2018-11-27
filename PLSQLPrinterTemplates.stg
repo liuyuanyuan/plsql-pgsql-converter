@@ -246,7 +246,7 @@ query_block(
 select <if (is_distinct)>
 distinct 
 <elseif (is_unique)>
-unique
+distinct
 <elseif (is_all)>
 all
 <endif>
