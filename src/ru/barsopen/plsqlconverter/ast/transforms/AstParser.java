@@ -52,10 +52,9 @@ public class AstParser {
 		
                 //(by lyy) remove name after end 
                 cts.fill();
-                //logger.debug("Tokens=" + cts.getTokens());
-                for (Token t : cts.getTokens())
-                {
-                    //logger.debug("token index=" + t.getType() + ", text=" + t.getText());
+                //logger.debug("Before Tokens=" + cts.getTokens());
+                cts.getTokens().stream().forEach((t) ->
+               {
                     if (t.getType() == PLSQLLexer.SQL92_RESERVED_END)
                     {
                         int index = t.getTokenIndex();
@@ -66,8 +65,9 @@ public class AstParser {
                             cts.getTokens().get(index + 2).setText("");
                             logger.debug("tokens=" + cts.getTokens().toString());
                         }
-                     }
-                }
+                    }
+                });
+                logger.debug("After Tokens=" + cts.getTokens());
                 
 		DerivedSqlParser p = new DerivedSqlParser(cts);
 		Object tree = ReflectionUtil.callMethod(ReflectionUtil.callMethod(p, treeType), "getTree");

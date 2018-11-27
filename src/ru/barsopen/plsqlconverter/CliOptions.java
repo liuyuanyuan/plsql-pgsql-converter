@@ -64,7 +64,7 @@ public class CliOptions {
 		int i = 0;
 		while (i < args.length) {
 			String arg = args[i];
-			logger.debug("arg=" + arg);
+			//logger.debug("arg=" + arg);
 			++i;
 			switch (arg) {
 			case "--help": result.help = true; break;
